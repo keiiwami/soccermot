@@ -64,7 +64,7 @@ class Debugger(object):
       bg * (1 - trans)).astype(np.uint8)
   
   def show_img(self, pause = False, imgId = 'default'):
-    cv2.imshow('{}'.format(imgId), self.imgs[imgId])
+    #cv2.imshow('{}'.format(imgId), self.imgs[imgId])
     if pause:
       cv2.waitKey()
   
@@ -207,7 +207,7 @@ class Debugger(object):
   def show_all_imgs(self, pause=False, Time=0):
     if 1:
       for i, v in self.imgs.items():
-        cv2.imshow('{}'.format(i), v)
+        #cv2.imshow('{}'.format(i), v)
       if not self.with_3d:
         cv2.waitKey(0 if pause else 1)
       else:
