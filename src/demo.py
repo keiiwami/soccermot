@@ -49,6 +49,9 @@ def demo(opt):
       print('resize video')
       img = cv2.resize(img, (opt.video_w, opt.video_h))
 
+    if img is None:
+      break
+
     ret = detector.run(img)
 
     # log run time
