@@ -25,8 +25,8 @@ def demo(opt):
   opt.debug = max(opt.debug, 1)
   detector = Detector(opt)
   cap = cv2.VideoCapture(opt.demo)
-  cap_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-  cap_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+  cap_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+  cap_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
   print("width : ", cap_width)
   print("height : ", cap_height)
   # Initialize output video
