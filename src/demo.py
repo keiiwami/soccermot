@@ -41,19 +41,26 @@ def demo(opt):
   results = {}
 
   print('read img from : ', opt.demo)
-  img = cv2.imread(opt.demo)
-  if opt.resize_video:
-    print('resize video')
-    img = cv2.resize(img, (opt.video_w, opt.video_h))
-  print(img)
-  ret = detector.run(img)
-  # log run time
-  time_str = 'frame {} |'.format(cnt)
-  for stat in time_stats:
-    time_str = time_str + '{} {:.3f}s |'.format(stat, ret[stat])
-  print(time_str)
+  cap = cv2.VideoCapture(opt.demo)
 
-  results[cnt] = ret['results']
+  while (cap.isOpened()):
+    retr, img = cap.read()
+    if opt.resize_video:
+      print('resize video')
+      img = cv2.resize(img, (opt.video_w, opt.video_h))
+
+    print(img)
+    ret = detector.run(img)
+
+    # log run time
+    time_str = 'frame {} |'.format(cnt)
+    for stat in time_stats:
+      time_str = time_str + '{} {:.3f}s |'.format(stat, ret[stat])
+    print(time_str)
+
+    results[cnt] = ret['results']
+    cnt += 1
+
   save_and_exit(opt, out, results, out_name)
 
   # while True:
