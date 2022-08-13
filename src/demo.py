@@ -49,12 +49,10 @@ def demo(opt):
 
   while (cap.isOpened()):
     ret, img = cap.read()
-
-    img = cv2.resize(img, (cap_width, cap_height))
-
     if img is None:
       break
 
+    img = cv2.resize(img, (cap_width, cap_height))
     ret = detector.run(img)
 
     # log run time
