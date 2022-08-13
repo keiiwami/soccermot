@@ -44,7 +44,7 @@ def demo(opt):
   if opt.resize_video:
     print('resize video')
     img = cv2.resize(img, (opt.video_w, opt.video_h))
-
+  print(img)
   ret = detector.run(img)
   # log run time
   time_str = 'frame {} |'.format(cnt)
