@@ -32,7 +32,7 @@ def demo(opt):
   # Initialize output video
   dt_now = datetime.datetime.now()
   out = None
-  out_name = dt_now.month + dt_now.day + dt_now.hour + dt_now.minute + (os.path.splitext(opt.demo)[0]).split('/')[-1]
+  out_name = dt_now.strftime('%Y:%m:%d:%H:%M:%S_') + (os.path.splitext(opt.demo)[0]).split('/')[-1]
   # out_name = opt.demo[opt.demo.rfind('/') + 1:]
   print('out_name', out_name)
   if opt.save_video:
