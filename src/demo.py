@@ -61,6 +61,7 @@ def demo(opt):
     print(time_str)
 
     results[cnt] = ret['results']
+    out.write(ret['generic'])
     cnt += 1
 
   print('finish!! write to ', out_name)
@@ -111,7 +112,7 @@ def demo(opt):
 def save_and_exit(opt, out=None, results=None, out_name=''):
   print(opt.save_results)
   print(results)
-  if opt.save_results and (results is not None):
+  if (results is not None):
     save_dir = '../results/{}_results.json'.format(opt.exp_id + '_' + out_name)
     print('saving results to', save_dir)
     json.dump(_to_list(copy.deepcopy(results)),
