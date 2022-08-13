@@ -63,6 +63,7 @@ def demo(opt):
     results[cnt] = ret['results']
     cnt += 1
 
+  print('finish!! write to ', out_name)
   save_and_exit(opt, out, results, out_name)
 
   # while True:
