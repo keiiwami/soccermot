@@ -40,6 +40,7 @@ def demo(opt):
   cnt = 0
   results = {}
 
+  print('read img from : ', opt.demo)
   img = cv2.imread(opt.demo)
   if opt.resize_video:
     print('resize video')
