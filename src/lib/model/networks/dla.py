@@ -510,8 +510,6 @@ class DeformConv(nn.Module):
             nn.BatchNorm2d(cho, momentum=BN_MOMENTUM),
             nn.ReLU(inplace=True)
         )
-        print(chi)
-        print(cho)
         self.conv = DCN(chi, cho, kernel_size=(3,3), stride=1, padding=1, dilation=1, deformable_groups=1)
 
     def forward(self, x):
