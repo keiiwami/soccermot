@@ -57,6 +57,8 @@ def demo(opt):
   cnt = 0
   results = {}
 
+  print('run...')
+
   while True:
       if is_video:
         _, img = cam.read()
