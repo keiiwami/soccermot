@@ -24,23 +24,7 @@ def demo(opt):
   opt.debug = max(opt.debug, 1)
   detector = Detector(opt)
 
-  if opt.demo == 'webcam' or \
-          opt.demo[opt.demo.rfind('.') + 1:].lower() in video_ext:
-    is_video = True
-    # demo on video stream
-    # cam = cv2.VideoCapture(0 if opt.demo == 'webcam' else opt.demo)
-  else:
-    is_video = False
-    # Demo on images sequences
-    if os.path.isdir(opt.demo):
-      image_names = []
-      ls = os.listdir(opt.demo)
-      for file_name in sorted(ls):
-        ext = file_name[file_name.rfind('.') + 1:].lower()
-        if ext in image_ext:
-          image_names.append(os.path.join(opt.demo, file_name))
-    else:
-      image_names = [opt.demo]
+  image_names = [opt.demo]
 
   # Initialize output video
   out = None
@@ -106,8 +90,7 @@ def demo(opt):
     # save debug image to video
     if opt.save_video:
       out.write(ret['generic'])
-      if not is_video:
-        cv2.imwrite('../results/demo{}.jpg'.format(cnt), ret['generic'])
+      # cv2.imwrite('../results/demo{}.jpg'.format(cnt), ret['generic'])
 
     # esc to quit and finish saving video
     if cv2.waitKey(1) == 27:
