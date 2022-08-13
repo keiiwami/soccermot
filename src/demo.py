@@ -24,8 +24,6 @@ def demo(opt):
   opt.debug = max(opt.debug, 1)
   detector = Detector(opt)
 
-  image_names = [opt.demo]
-
   # Initialize output video
   out = None
   out_name = opt.demo[opt.demo.rfind('/') + 1:]
@@ -42,7 +40,7 @@ def demo(opt):
   cnt = 0
   results = {}
 
-  img = cv2.imread(image_names[cnt])
+  img = cv2.imread(opt.demo)
   if opt.resize_video:
     print('resize video')
     img = cv2.resize(img, (opt.video_w, opt.video_h))
@@ -57,46 +55,46 @@ def demo(opt):
   results[cnt] = ret['results']
   save_and_exit(opt, out, results, out_name)
 
-  while True:
-    if cnt < len(image_names):
-      img = cv2.imread(image_names[cnt])
-    else:
-      save_and_exit(opt, out, results, out_name)
-    cnt += 1
+  # while True:
+  #   if cnt < len(image_names):
+  #     img = cv2.imread(image_names[cnt])
+  #   else:
+  #     save_and_exit(opt, out, results, out_name)
+  #   cnt += 1
 
-    # resize the original video for saving video results
-    if opt.resize_video:
-      img = cv2.resize(img, (opt.video_w, opt.video_h))
+  #   # resize the original video for saving video results
+  #   if opt.resize_video:
+  #     img = cv2.resize(img, (opt.video_w, opt.video_h))
 
-    # skip the first X frames of the video
-    # if cnt < opt.skip_first:
-      # continue
+  #   # skip the first X frames of the video
+  #   # if cnt < opt.skip_first:
+  #     # continue
 
-    # cv2.imshow('input', img)
+  #   # cv2.imshow('input', img)
 
-    # track or detect the image.
-    ret = detector.run(img)
+  #   # track or detect the image.
+  #   ret = detector.run(img)
 
-    # log run time
-    time_str = 'frame {} |'.format(cnt)
-    for stat in time_stats:
-      time_str = time_str + '{} {:.3f}s |'.format(stat, ret[stat])
-    print(time_str)
+  #   # log run time
+  #   time_str = 'frame {} |'.format(cnt)
+  #   for stat in time_stats:
+  #     time_str = time_str + '{} {:.3f}s |'.format(stat, ret[stat])
+  #   print(time_str)
 
-    # results[cnt] is a list of dicts:
-    #  [{'bbox': [x1, y1, x2, y2], 'tracking_id': id, 'category_id': c, ...}]
-    results[cnt] = ret['results']
+  #   # results[cnt] is a list of dicts:
+  #   #  [{'bbox': [x1, y1, x2, y2], 'tracking_id': id, 'category_id': c, ...}]
+  #   results[cnt] = ret['results']
 
-    # save debug image to video
-    if opt.save_video:
-      out.write(ret['generic'])
-      # cv2.imwrite('../results/demo{}.jpg'.format(cnt), ret['generic'])
+  #   # save debug image to video
+  #   if opt.save_video:
+  #     out.write(ret['generic'])
+  #     # cv2.imwrite('../results/demo{}.jpg'.format(cnt), ret['generic'])
 
-    # esc to quit and finish saving video
-    if cv2.waitKey(1) == 27:
-      save_and_exit(opt, out, results, out_name)
-      return
-  # save_and_exit(opt, out, results)
+  #   # esc to quit and finish saving video
+  #   if cv2.waitKey(1) == 27:
+  #     save_and_exit(opt, out, results, out_name)
+  #     return
+  # # save_and_exit(opt, out, results)
 
 
 def save_and_exit(opt, out=None, results=None, out_name=''):
