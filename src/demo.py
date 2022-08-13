@@ -12,6 +12,7 @@ import copy
 import numpy as np
 from opts import opts
 from detector import Detector
+import datetime
 
 
 image_ext = ['jpg', 'jpeg', 'png', 'webp']
@@ -23,10 +24,15 @@ def demo(opt):
   os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus_str
   opt.debug = max(opt.debug, 1)
   detector = Detector(opt)
-
+  cap = cv2.VideoCapture(opt.demo)
+  cap_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+  cap_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+  print("width : ", cap_width)
+  print("height : ", cap_height)
   # Initialize output video
+  dt_now = datetime.datetime.now()
   out = None
-  out_name = (os.path.splitext(opt.demo)[0]).split('/')[-1]
+  out_name = dt_now.month + dt_now.day + dt_now.hour + dt_now.minute + (os.path.splitext(opt.demo)[0]).split('/')[-1]
   # out_name = opt.demo[opt.demo.rfind('/') + 1:]
   print('out_name', out_name)
   if opt.save_video:
@@ -34,21 +40,17 @@ def demo(opt):
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     out = cv2.VideoWriter('../results/{}.mp4'.format(
         opt.exp_id + '_' + out_name), fourcc, opt.save_framerate, (
-        opt.video_w, opt.video_h))
+        cap_width, cap_height))
 
-  if opt.debug < 5:
-    detector.pause = False
   cnt = 0
   results = {}
 
   print('read img from : ', opt.demo)
-  cap = cv2.VideoCapture(opt.demo)
 
   while (cap.isOpened()):
     ret, img = cap.read()
-    if opt.resize_video:
-      print('resize video')
-      img = cv2.resize(img, (opt.video_w, opt.video_h))
+
+    img = cv2.resize(img, (cap_width, cap_height))
 
     if img is None:
       break
