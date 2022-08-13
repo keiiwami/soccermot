@@ -10,6 +10,8 @@ import time
 import torch
 import math
 
+from opts import opts
+
 from model.model import create_model, load_model
 from model.decode import generic_decode
 from model.utils import flip_tensor, flip_lr_off, flip_lr
@@ -22,15 +24,24 @@ from dataset.dataset_factory import get_dataset
 
 
 class Detector(object):
-  def __init__(self, opt):
-    if opt.gpus[0] >= 0:
-      opt.device = torch.device('cuda')
-    else:
-      opt.device = torch.device('cpu')
-    
+
+  def __init__(self, opt: opts):
+    #if opt.gpus[0] >= 0:
+    #  opt.device = torch.device('cuda')
+    #  print("opt device is cuda")
+    #else:
+    #  opt.device = torch.device('cpu')
+    #  print("opt device is cpu")
+			
+    # wip: always cpu...
+    opt.device = torch.device('cpu')
+
     print('Creating model...')
+    print(opt.arch)
+
     self.model = create_model(
       opt.arch, opt.heads, opt.head_conv, opt=opt)
+    
     self.model = load_model(self.model, opt.load_model, opt)
     self.model = self.model.to(opt.device)
     self.model.eval()
