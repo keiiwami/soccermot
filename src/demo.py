@@ -40,7 +40,7 @@ def demo(opt):
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
     out = cv2.VideoWriter('../results/{}.mp4'.format(
         opt.exp_id + '_' + out_name), fourcc, opt.save_framerate,
-        cap_width, cap_height)
+        (cap_width, cap_height))
 
   cnt = 0
   results = {}
