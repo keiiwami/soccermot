@@ -44,12 +44,11 @@ def demo(opt):
   cap = cv2.VideoCapture(opt.demo)
 
   while (cap.isOpened()):
-    retr, img = cap.read()
+    ret, img = cap.read()
     if opt.resize_video:
       print('resize video')
       img = cv2.resize(img, (opt.video_w, opt.video_h))
 
-    print(img)
     ret = detector.run(img)
 
     # log run time
