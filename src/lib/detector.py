@@ -39,8 +39,7 @@ class Detector(object):
     print('Creating model...')
     print(opt.arch)
 
-    self.model = create_model(
-        opt.arch, opt.heads, opt.head_conv, opt=opt)
+    self.model = create_model(opt.arch, opt.heads, opt.head_conv, opt=opt)
 
     self.model = load_model(self.model, opt.load_model, opt)
     self.model = self.model.to(opt.device)
@@ -48,10 +47,8 @@ class Detector(object):
 
     self.opt = opt
     self.trained_dataset = get_dataset(opt.dataset)
-    self.mean = np.array(
-        self.trained_dataset.mean, dtype=np.float32).reshape(1, 1, 3)
-    self.std = np.array(
-        self.trained_dataset.std, dtype=np.float32).reshape(1, 1, 3)
+    self.mean = np.array(self.trained_dataset.mean, dtype=np.float32).reshape(1, 1, 3)
+    self.std = np.array(self.trained_dataset.std, dtype=np.float32).reshape(1, 1, 3)
     self.pause = not opt.no_pause
     self.rest_focal_length = self.trained_dataset.rest_focal_length \
         if self.opt.test_focal_length < 0 else self.opt.test_focal_length
@@ -62,89 +59,52 @@ class Detector(object):
     self.tracker = Tracker(opt)
     self.debugger = Debugger(opt=opt, dataset=self.trained_dataset)
 
-  def run(self, image_or_path_or_tensor, meta={}):
+  def run(self, image, meta={}):
     load_time, pre_time, net_time, dec_time, post_time = 0, 0, 0, 0, 0
     merge_time, track_time, tot_time, display_time = 0, 0, 0, 0
     self.debugger.clear()
     start_time = time.time()
-
-    # read image
-    pre_processed = False
-    if isinstance(image_or_path_or_tensor, np.ndarray):
-      image = image_or_path_or_tensor
-    elif type(image_or_path_or_tensor) == type(''):
-      image = cv2.imread(image_or_path_or_tensor)
-    else:
-      image = image_or_path_or_tensor['image'][0].numpy()
-      pre_processed_images = image_or_path_or_tensor
-      pre_processed = True
 
     loaded_time = time.time()
     load_time += (loaded_time - start_time)
 
     detections = []
 
-    # for multi-scale testing
+    # 複数のスケールでテストする
     for scale in self.opt.test_scales:
       scale_start_time = time.time()
-      if not pre_processed:
-        # not prefetch testing or demo
-        images, meta = self.pre_process(image, scale, meta)
-      else:
-        # prefetch testing
-        images = pre_processed_images['images'][scale][0]
-        meta = pre_processed_images['meta'][scale]
-        meta = {k: v.numpy()[0] for k, v in meta.items()}
-        if 'pre_dets' in pre_processed_images['meta']:
-          meta['pre_dets'] = pre_processed_images['meta']['pre_dets']
-        if 'cur_dets' in pre_processed_images['meta']:
-          meta['cur_dets'] = pre_processed_images['meta']['cur_dets']
+      images, meta = self.pre_process(image, scale, meta)
 
       images = images.to(self.opt.device, non_blocking=self.opt.non_block_test)
 
-      # initializing tracker
+      # トラッカーの初期化
       pre_hms, pre_inds = None, None
       if self.opt.tracking:
-        # initialize the first frame
+        # 初期フレームだった場合にトラッキングを初期化する
         if self.pre_images is None:
           print('Initialize tracking!')
           self.pre_images = images
-          self.tracker.init_track(
-              meta['pre_dets'] if 'pre_dets' in meta else [])
-        if self.opt.pre_hm:
-          # render input heatmap from tracker status
-          # pre_inds is not used in the current version.
-          # We used pre_inds for learning an offset from previous image to
-          # the current image.
-          pre_hms, pre_inds = self._get_additional_inputs(
-              self.tracker.tracks, meta, with_hm=not self.opt.zero_pre_hm)
+          self.tracker.init_track(meta['pre_dets'] if 'pre_dets' in meta else [])
 
       pre_process_time = time.time()
       pre_time += pre_process_time - scale_start_time
 
-      # run the network
-      # output: the output feature maps, only used for visualizing
-      # dets: output tensors after extracting peaks
-      output, dets, forward_time = self.process(
-          images, self.pre_images, pre_hms, pre_inds, return_time=True)
+      # ネットワークを実行する
+      # dets: ピーク抽出後の出力
+      _, dets, forward_time = self.process(images, self.pre_images, None, None, return_time=True)
       net_time += forward_time - pre_process_time
       decode_time = time.time()
       dec_time += decode_time - forward_time
 
-      # convert the cropped and 4x downsampled output coordinate system
-      # back to the input image coordinate system
+      # 切り取られて 4 倍にダウンサンプリングされた出力座標系を変換する
+      # 入力画像座標系に戻る
       result = self.post_process(dets, meta, scale)
       post_process_time = time.time()
       post_time += post_process_time - decode_time
 
       detections.append(result)
-      if self.opt.debug >= 2:
-        self.debug(
-            self.debugger, images, result, output, scale,
-            pre_images=self.pre_images if not self.opt.no_pre_img else None,
-            pre_hms=pre_hms)
 
-    # merge multi-scale testing results
+    # 複数のスケールでテストした結果をマージする
     results = self.merge_outputs(detections)
     torch.cuda.synchronize()
     end_time = time.time()
@@ -153,7 +113,7 @@ class Detector(object):
     if self.opt.tracking:
       # public detection mode in MOT challenge
       public_det = meta['cur_dets'] if self.opt.public_det else None
-      # add tracking id to results
+      # トラッキングIDを付与する
       results = self.tracker.step(results, public_det)
       self.pre_images = images
 
@@ -161,8 +121,6 @@ class Detector(object):
     track_time += tracking_time - end_time
     tot_time += tracking_time - start_time
 
-    if self.opt.debug >= 1:
-      self.show_results(self.debugger, image, results)
     self.cnt += 1
 
     show_results_time = time.time()
@@ -214,8 +172,8 @@ class Detector(object):
 
   def pre_process(self, image, scale, input_meta={}):
     '''
-    Crop, resize, and normalize image. Gather meta data for post processing 
-      and tracking.
+    画像のトリミング、サイズ変更、および正規化。後処理のためにメタデータを収集する
+      そして追跡。
     '''
     resized_image, c, s, inp_width, inp_height, height, width = \
         self._transform_scale(image)
@@ -302,6 +260,7 @@ class Detector(object):
     return calib
 
   def _sigmoid_output(self, output):
+    print(output)
     if 'hm' in output:
       output['hm'] = output['hm'].sigmoid_()
     if 'hm_hp' in output:
