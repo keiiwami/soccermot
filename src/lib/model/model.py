@@ -27,7 +27,7 @@ def create_model(arch, head, head_conv, opt=None):
   arch = arch[:arch.find('_')] if '_' in arch else arch
   # model_class = _network_factory[arch]
   # model = model_class(num_layers, heads=head, head_convs=head_conv, opt=opt)
-  model = PoseResDCN(num_layers, heads=head, head_convs=head_conv)
+  model = PoseResDCN(num_layers, heads=head, head_convs=head_conv, opt=opt)
   return model
 
 
