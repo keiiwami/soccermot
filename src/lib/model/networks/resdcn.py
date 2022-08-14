@@ -179,7 +179,7 @@ class PoseResDCN(BaseModel):
           [4, 4, 4],
       )
 
-    self.init_weights(num_layers, _.rgb)
+    self.init_weights(num_layers)
 
   def img2feats(self, x):
     x = self.conv1(x)
