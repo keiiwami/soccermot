@@ -115,8 +115,8 @@ resnet_spec = {18: (BasicBlock, [2, 2, 2, 2]),
 
 class PoseResNet(nn.Module):
 
-  def __init__(self, num_layers, heads, head_convs, _):
-    super(PoseResNet, self).__init__(heads, head_convs, 1, 64)
+  def __init__(self, num_layers, heads, head_convs, opt):
+    super(PoseResNet, self).__init__(heads, head_convs, 1, 64 if num_layers == 34 else 128, opt=opt)
     block, layers = resnet_spec[num_layers]
     self.inplanes = 64
     self.deconv_with_bias = False
