@@ -115,7 +115,7 @@ resnet_spec = {18: (BasicBlock, [2, 2, 2, 2]),
 
 class PoseResNet(nn.Module):
 
-  def __init__(self, num_layers, heads, head_convs, opt):
+  def __init__(self, num_layers, heads, head_convs, _):
     super(PoseResNet, self).__init__(heads, head_convs, 1, 64)
     block, layers = resnet_spec[num_layers]
     self.inplanes = 64
