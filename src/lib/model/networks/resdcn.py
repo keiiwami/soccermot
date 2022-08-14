@@ -144,7 +144,7 @@ resnet_spec = {18: (BasicBlock, [2, 2, 2, 2]),
 
 class PoseResDCN(BaseModel):
   # def __init__(self, block, layers, heads, head_conv):
-  def __init__(self, num_layers, heads, head_convs, _):
+  def __init__(self, num_layers, heads, head_convs):
     assert head_convs['hm'][0] in [64, 256]
     super(PoseResDCN, self).__init__(
         heads, head_convs, 1, head_convs['hm'][0], opt=_)
