@@ -29,7 +29,7 @@ def create_model(arch, head, head_conv, opt=None):
   if arch == 'dla':
     model = model_class(num_layers, heads=head, head_convs=head_conv, opt=opt)
   else:
-    model = model_class(num_layers, heads=head, head_convs=head_conv)
+    model = model_class(num_layers, heads=head, head_convs=head_conv, opt=opt)
   return model
 
 
