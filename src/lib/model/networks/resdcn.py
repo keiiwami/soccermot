@@ -147,7 +147,7 @@ class PoseResDCN(BaseModel):
   def __init__(self, num_layers, heads, head_convs):
     assert head_convs['hm'][0] in [64, 256]
     super(PoseResDCN, self).__init__(
-        heads, head_convs, 1, head_convs['hm'][0], opt=_)
+        heads, head_convs, 1, head_convs['hm'][0], opt=None)
     block, layers = resnet_spec[num_layers]
     self.inplanes = 64
     self.deconv_with_bias = False
