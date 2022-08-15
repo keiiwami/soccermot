@@ -91,7 +91,7 @@ class Detector(object):
 
       # ネットワークを実行する
       # dets: ピーク抽出後の出力
-      _, dets, forward_time = self.process(images, self.pre_images, None, None, return_time=True)
+      output, dets, forward_time = self.process(images, self.pre_images, None, None, return_time=True)
       net_time += forward_time - pre_process_time
       decode_time = time.time()
       dec_time += decode_time - forward_time
@@ -103,6 +103,11 @@ class Detector(object):
       post_time += post_process_time - decode_time
 
       detections.append(result)
+      if self.opt.debug >= 2:
+        self.debug(
+            self.debugger, images, result, output, scale,
+            pre_images=self.pre_images if not self.opt.no_pre_img else None,
+            pre_hms=pre_hms)
 
     # 複数のスケールでテストした結果をマージする
     results = self.merge_outputs(detections)
@@ -120,6 +125,9 @@ class Detector(object):
     tracking_time = time.time()
     track_time += tracking_time - end_time
     tot_time += tracking_time - start_time
+
+    if self.opt.debug >= 1:
+      self.show_results(self.debugger, image, results)
 
     self.cnt += 1
 
