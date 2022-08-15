@@ -268,9 +268,8 @@ class Detector(object):
     return calib
 
   def _sigmoid_output(self, output):
-    print(output)
     if 'hm' in output:
-      output['hm'] = output['hm'].sigmoid_()
+      output['hm'] = output['hm'].sigmoid_()  # 活性化関数
     if 'hm_hp' in output:
       output['hm_hp'] = output['hm_hp'].sigmoid_()
     if 'dep' in output:
