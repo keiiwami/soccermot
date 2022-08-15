@@ -399,26 +399,6 @@ class Detector(object):
           debugger.add_coco_hp(item['hps'], tracking_id=tracking_id,
                                img_id='generic')
 
-    # TODO debugを使用しない
-    # if len(results) > 0 and \
-    #         'dep' in results[0] and 'alpha' in results[0] and 'dim' in results[0]:
-    #   debugger.add_3d_detection(
-    #       image if not self.opt.qualitative else cv2.resize(
-    #           debugger.imgs['pred_hm'], (image.shape[1], image.shape[0])),
-    #       False, results, self.this_calib,
-    #       vis_thresh=self.opt.vis_thresh, img_id='ddd_pred')
-    #   debugger.add_bird_view(
-    #       results, vis_thresh=self.opt.vis_thresh,
-    #       img_id='bird_pred', cnt=self.cnt)
-    #   if self.opt.show_track_color and self.opt.debug == 4:
-    #     del debugger.imgs['generic'], debugger.imgs['bird_pred']
-    # if 'ddd_pred' in debugger.imgs:
-    #   debugger.imgs['generic'] = debugger.imgs['ddd_pred']
-    # if self.opt.debug == 4:
-    #   debugger.save_all_imgs(self.opt.debug_dir, prefix='{}'.format(self.cnt))
-    # else:
-    #   debugger.show_all_imgs(pause=self.pause)
-
   def reset_tracking(self):
     self.tracker.reset()
     self.pre_images = None
