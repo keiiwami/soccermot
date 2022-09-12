@@ -1,2 +1,5 @@
 SNMOT-060/
 SNMOT-060-20220911T194457Z-001.zip
+.vscode/settings.json
+*.pyc
+src/demo02/lib/data/
