@@ -5,4 +5,5 @@ SNMOT-060-20220911T194457Z-001.zip
 src/demo02/lib/data/
 *.jpg
 *.png
+*.mat
 refarence/
