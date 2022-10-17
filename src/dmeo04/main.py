@@ -38,11 +38,11 @@ import pyflann
 
 # TODO two-GANでエッジ(mat)生成
 opt = TestOptions()
-opt.dataroot = "./data/soccer_seg_detection"
+# opt.dataroot = "./data/soccer_seg_detection"
+opt.dataroot = "./data/SNMOT-060/img"
 
-opt.how_many = 100
+opt.how_many = 300
 
-# opt.dataroot = "./data/SNMOT-060/img"
 opt.which_direction = "AtoB"
 opt.model = "two_pix2pix"
 opt.name = "soccer_seg_detection_pix2pix"
@@ -89,8 +89,8 @@ webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.na
 model: TwoPix2PixModel = TwoPix2PixModel()
 model.initialize(opt)
 
-pivot_images = np.zeros((10000, 1, 180, 320), np.float32)
-edge_map = np.zeros((10000, 180, 320, 3), np.float32)
+pivot_images = np.zeros((10000, 1, 180, 320), np.uint8)
+# edge_map = np.zeros((10000, 180, 320, 3), np.float64)
 gan_visuals = []
 for i, data in enumerate(dataset):
     if i >= opt.how_many:
@@ -102,15 +102,28 @@ for i, data in enumerate(dataset):
     gan_visuals.append(model.get_current_visuals())
 
     im = model.get_im_fake_D()
-    im = np.array(Image.fromarray(im).resize((180, 320)))
-
+    im = np.array(Image.fromarray(im).resize((320, 180)))
+    # print("max: ", np.amax(im))
+    # print("min: ", np.amin(im))
+    # Image.fromarray(im).show()
     for j, d1 in enumerate(im):
         for k, rgb in enumerate(d1):
-            g = ((rgb[0] + rgb[1] + rgb[2]) / 256)
-            pivot_images[i][0][k][j] = g
-            edge_map[i][k][j][0] = g
-            edge_map[i][k][j][1] = g
-            edge_map[i][k][j][2] = g
+            # g = int(((rgb[0] + rgb[1] + rgb[2]) / 255.0) * 255)
+            # 0 , 64, 128, 191, 255
+            g = rgb[0]
+            if g > 129:
+                g = 255
+            elif g > 65:
+                g = 128
+            else:
+                g = 0
+            pivot_images[i][0][j][k] = g
+
+# for i in range(180):
+#     for j in range(320):
+#         if pivot_images[0][0][i][j] > 0:
+#             print(pivot_images[0][0][i][j])
+# exit()
 
 
 # TODO networkでfeature変換
@@ -136,7 +149,7 @@ net = SiameseNetwork(branch)
 checkpoint = torch.load(model_name, map_location=lambda storage, loc: storage)
 net.load_state_dict(checkpoint['state_dict'])
 
-data = sio.loadmat('./models/feature_camera_10k.mat')
+data = sio.loadmat('./models/feature_camera_50k.mat')
 database_features = data['features']
 database_cameras = data['cameras']
 flann = pyflann.FLANN()
@@ -152,16 +165,27 @@ for i in range(opt.how_many):
     # for i in range(len(data_loader)):
     print('%04d: retrieved image...' % (i))
 
-    x, _ = data_loader[i]
+    x, pivod = data_loader[i]
     x = x.to(device)
+    # print(x[0][0])
+    # print(x.shape)
+
+    # for ii in range(180):
+    #     for jj in range(320):
+    #         if x[0][0][ii][jj] > 0:
+    #             print(x[0][0][ii][jj].item())
+
     feat = net.feature_numpy(x)  # N x C
-    # print(feat[0].shape)
-    # print(database_features[0].shape)
 
     # Step 2: retrieve a camera using deep features
     result, _ = flann.nn(database_features, feat[0], 1, algorithm="kdtree", trees=8, checks=64)
+    # result, _ = flann.nn(database_features, database_features[i], 1, algorithm="kdtree", trees=8, checks=64)
     retrieved_index = result[0]
     retrieved_camera_data = database_cameras[retrieved_index]
+
+    diff_sum = sum(abs(feat[0] - database_features[retrieved_index]))
+    print(diff_sum)
+
     u, v, fl = retrieved_camera_data[0:3]
     rod_rot = retrieved_camera_data[3:6]
     cc = retrieved_camera_data[6:9]
@@ -169,7 +193,7 @@ for i in range(opt.how_many):
     retrieved_h = IouUtil.template_to_image_homography_uot(retrieved_camera, template_h, template_w)
     retrieved_image = SyntheticUtil.camera_to_edge_image(retrieved_camera_data, model_points, model_line_index,
                                                          im_h=720, im_w=1280, line_width=4)
-    query_image = edge_map[i]
+    # query_image = edge_map[i]
     # cv.imwrite('result/sccvsd/result{}_A.jpg'.format(i), query_image)
     # cv.imwrite('result/sccvsd/result{}_Q.jpg'.format(i), retrieved_image)
 
@@ -187,6 +211,9 @@ for i in range(opt.how_many):
     visuals = gan_visuals[i]
     visuals["retrieved_image"] = retrieved_image
     visuals["template_H"] = h_img
-    visualizer.save_images2(webpage, visuals, i, 180, 320)
+    visuals["pivod"] = np.array(pivod)
+    print(visuals["pivod"].shape)
+    # visuals["query_image"] = query_image
+    visualizer.save_images2(webpage, visuals, i, diff_sum, 180, 320)
 
 webpage.save()

@@ -106,7 +106,7 @@ class TwoPix2PixModel:
         self.masked_A = masked_A
         """
         self.fake_D = self.detec_netG(self.fake_C)
-        self.real_D = Variable(self.input_B, volatile=True)
+        self.real_D = self.real_A
 
     def get_image_paths(self):
         assert not self.isTrain
@@ -218,12 +218,12 @@ class TwoPix2PixModel:
             real_D = util.tensor2im(self.real_D.data)
             fake_C = util.tensor2im(self.fake_C.data)
             return OrderedDict([
-                ('real_A', real_A), 
-                # ('fake_B', fake_B), 
+                ('real_A', real_A),
+                # ('fake_B', fake_B),
                 # ('fake_C', fake_C),
-                ('fake_D', fake_D), 
+                ('fake_D', fake_D),
                 # ('real_D', real_D)
-                ])
+            ])
 
     def get_fake_D(self):
         return util.tensor2im(self.fake_D.data)

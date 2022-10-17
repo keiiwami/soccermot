@@ -57,16 +57,42 @@ class CameraDataset(Dataset):
         x = torch.zeros(bsize, c, h, w)
         label_dummy = torch.zeros(bsize)
 
-        for i in range(start_index, end_index):
-            pivot = self.pivot_data[i].squeeze()
-            pivot = Image.fromarray(pivot)
+        # for ii in range(180):
+        #     for jj in range(320):
+        #         print(self.pivot_data[index][0][ii][jj].item())
+        # exit()
 
-            x[i - start_index, :] = self.data_transform(pivot)
-            label_dummy[i - start_index] = 0
+        # print(self.data_transform)
+        # exit()
+
+        # print("[start_index, end_index]", start_index, end_index)
+        # for i in range(start_index, end_index):
+        #     pivot = self.pivot_data[i].squeeze()
+        #     pivot = Image.fromarray(pivot)
+        #     # print(pivot)
+        #     # exit()
+
+        #     x[i - start_index, :] = self.data_transform(pivot)
+        #     label_dummy[i - start_index] = 0
+
+        pivot = self.pivot_data[index].squeeze()
+
+        pivot = Image.fromarray(pivot)
+        x[0, :] = self.data_transform(pivot)
+        # pivot.show()
+        # exit()
+        label_dummy[0] = 0
 
         #x = torch.tensor(x, requires_grad=True)
         x = x.clone().detach().requires_grad_(True)
-        return x, label_dummy
+
+        # for ii in range(180):
+        #     for jj in range(320):
+        #         if x[0][0][ii][jj].item() > 0:
+        #             print(x[0][0][ii][jj].item())
+        # exit()
+
+        return x, pivot
 
     def __getitem__(self, index):
         if self.is_train:

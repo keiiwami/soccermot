@@ -4,6 +4,7 @@ from PIL import Image
 import torch
 from torch.utils.data.dataset import Dataset
 
+
 class CameraDataset(Dataset):
     def __init__(self,
                  pivot_data,
@@ -37,8 +38,8 @@ class CameraDataset(Dataset):
 
         if not self.is_train:
             # in testing, loop over all pivot cameras
-            self.num_batch = self.num_camera//batch_size
-            if self.num_camera%batch_size != 0:
+            self.num_batch = self.num_camera // batch_size
+            if self.num_camera % batch_size != 0:
                 self.num_batch += 1
 
     def _sample_once(self):
@@ -70,20 +71,35 @@ class CameraDataset(Dataset):
 
         start_index = batch_size * index
         end_index = min(start_index + batch_size, self.num_camera)
-        bsize = end_index-start_index
+        bsize = end_index - start_index
 
         x = torch.zeros(bsize, c, h, w)
         label_dummy = torch.zeros(bsize)
 
+        # for ii in range(180):
+        #     for jj in range(320):
+        #         print(self.pivot_data[index][0][ii][jj].item())
+        # exit()
+
+        # print(self.data_transform)
+        # exit()
+        print(type(self.pivot_data))
+        print("[start_index, end_index]", start_index, end_index)
+
         for i in range(start_index, end_index):
             pivot = self.pivot_data[i].squeeze()
             pivot = Image.fromarray(pivot)
+            print(pivot)
+            pivot.show()
+            exit()
 
-            x[i-start_index, :] = self.data_transform(pivot)
-            label_dummy[i-start_index] = 0
+            x[i - start_index, :] = self.data_transform(pivot)
+            label_dummy[i - start_index] = 0
 
         #x = torch.tensor(x, requires_grad=True)
         x = x.clone().detach().requires_grad_(True)
+        print(x.requires_grad)
+        print(x)
         return x, label_dummy
 
     def _get_train_item(self, index):
@@ -129,7 +145,6 @@ class CameraDataset(Dataset):
         x2 = x2.clone().detach().requires_grad_(True)
         return x1, x2, label
 
-
     def __getitem__(self, index):
         if self.is_train:
             return self._get_train_item(index)
@@ -138,6 +153,7 @@ class CameraDataset(Dataset):
 
     def __len__(self):
         return self.num_batch
+
 
 def ut():
     import scipy.io as sio
@@ -175,4 +191,3 @@ def ut():
 
 if __name__ == '__main__':
     ut()
-

@@ -1,0 +1,8 @@
+(50000, 1, 180, 320)
+Note: assume input image resolution is 180 x 320 (h x w)
+load 782 batch edge images
+load model file from network.pth.
+computation device: cpu
+<class 'numpy.ndarray'>
+[start_index, end_index] 0 64
+<PIL.Image.Image image mode=L size=320x180 at 0x124A54E50>

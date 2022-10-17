@@ -153,23 +153,39 @@ class Visualizer():
             links.append(image_name)
         webpage.add_images(ims, txts, links, width=self.win_size)
 
-    def save_images2(self, webpage, visuals, index, W, H):
+    def save_images2(self, webpage, visuals, index, diff, W, H):
         image_dir = webpage.get_image_dir()
-        name = "[{}]".format(index)
+        name = "[{}] d = {}".format(index, diff)
 
         webpage.add_header(name)
         ims = []
         txts = []
         links = []
 
+        i_im = np.zeros((H, W))
+        o_im = np.zeros((H, W))
         for label, im in visuals.items():
-            image_name = '%s_%s.png' % (name, label)
+            image_name = '%s_%s.png' % (index, label)
             save_path = os.path.join(image_dir, image_name)
-            h, w, _ = im.shape
-            im = np.array(Image.fromarray(im).resize((H , W)))
+            # h, w, _ = im.shape
+            im = np.array(Image.fromarray(im).resize((H, W)))
             util.save_image(im, save_path)
 
             ims.append(image_name)
             txts.append(label)
             links.append(image_name)
+            if label == "real_A":
+                i_im = im
+            if label == "template_H":
+                o_im = im
+
+        io_im = np.vstack([i_im, o_im])
+        io_im = np.array(Image.fromarray(io_im).resize((H, W * 2)))
+        image_name = '%s_io.png' % (index)
+        save_path = os.path.join(image_dir, image_name)
+        ims.append(image_name)
+        txts.append(label)
+        links.append(image_name)
+        util.save_image(io_im, save_path)
+
         webpage.add_images(ims, txts, links, width=self.win_size)
