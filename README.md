@@ -1,3 +1,12 @@
+## RESULT
+
+SCCvSDをSoccerNetのデータに適応
+
+![](./result/1666031017.gif)
+
+
+
+# MEMO
 
 ## GANの学習
 ```
@@ -13,4 +22,3 @@ python3 test_two_pix2pix.py --dataroot ./datasets/soccer_seg_detection --which_d
 python3 demo.py --feature-type 'deep' --query-index 0
 ```
 
-![](./result/1666031017.gif)

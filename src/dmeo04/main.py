@@ -39,9 +39,12 @@ import pyflann
 # TODO two-GANでエッジ(mat)生成
 opt = TestOptions()
 # opt.dataroot = "./data/soccer_seg_detection"
-opt.dataroot = "./data/SNMOT-060/img"
+# opt.dataroot = "./data/SNMOT-060/img"
+opt.dataroot = "./data/img1"
 
-opt.how_many = 300
+save_p = "img01"
+
+opt.how_many = 750
 
 opt.which_direction = "AtoB"
 opt.model = "two_pix2pix"
@@ -82,7 +85,7 @@ dataset = data_loader.load_data()
 
 # Visualizer
 visualizer = Visualizer(opt)
-web_dir = os.path.join(opt.results_dir, "webpage")
+web_dir = os.path.join(opt.results_dir, ('webpage_%s' % (save_p)))
 webpage = html.HTML(web_dir, 'Experiment = %s, Phase = %s, Epoch = %s' % (opt.name, opt.phase, opt.which_epoch))
 
 # モデル生成
