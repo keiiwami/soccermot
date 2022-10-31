@@ -40,9 +40,10 @@ import pyflann
 opt = TestOptions()
 # opt.dataroot = "./data/soccer_seg_detection"
 # opt.dataroot = "./data/SNMOT-060/img"
-opt.dataroot = "./data/img1"
+# opt.dataroot = "./data/img1"
+opt.dataroot = "./data/SNMOT-060/img"
 
-save_p = "img01"
+save_p = "SNMOT-060"
 
 opt.how_many = 750
 
@@ -164,6 +165,7 @@ model_line_index = data['line_segment_index']
 template_h = 74  # yard, soccer template
 template_w = 115
 
+diff_sums = []
 for i in range(opt.how_many):
     # for i in range(len(data_loader)):
     print('%04d: retrieved image...' % (i))
@@ -187,7 +189,6 @@ for i in range(opt.how_many):
     retrieved_camera_data = database_cameras[retrieved_index]
 
     diff_sum = sum(abs(feat[0] - database_features[retrieved_index]))
-    print(diff_sum)
 
     u, v, fl = retrieved_camera_data[0:3]
     rod_rot = retrieved_camera_data[3:6]
@@ -219,4 +220,9 @@ for i in range(opt.how_many):
     # visuals["query_image"] = query_image
     visualizer.save_images2(webpage, visuals, i, diff_sum, 180, 320)
 
+    diff_sums.append(diff_sum)
+
 webpage.save()
+
+for d in diff_sums:
+    print(d)
